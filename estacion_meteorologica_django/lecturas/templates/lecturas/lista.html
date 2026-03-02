@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lecturas Estación Meteorológica</title>
+</head>
+<body>
+
+<h2>Lecturas Meteorológicas</h2>
+
+<!-- Botón de refrescar manual -->
+<button onclick="location.reload()">Refrescar</button>
+
+<br><br>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Estacion</th>
+        <th>Sensor</th>
+        <th>Valor</th>
+        <th>Fecha</th>
+    </tr>
+
+    {% for lectura in page_obj %}
+    <tr>
+        <td>{{ lectura.id }}</td>
+        <td>{{ lectura.estacion }}</td>
+        <td>{{ lectura.sensor }}</td>
+        <td>{{ lectura.valor }}</td>
+        <td>{{ lectura.fecha }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No hay datos disponibles</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+
+<!-- Paginación -->
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?page=1">Primera</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+    {% endif %}
+</div>
+
+</body>
+</html>

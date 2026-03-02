@@ -3,12 +3,12 @@ import random
 import time
 import json
 
-BROKER = "mqtt.eict.ce.pucmm.edu.do"
+BROKER = "test.mosquitto.org"
 PORT = 1883
 USER = "itt363-grupo3"
 CLAVE = "CnFebqnjbq7F"
 
-ESTACIONES = ["estacion-01"]
+ESTACIONES = ["estacion-1"]
 
 
 def on_connect(client, userdata, flags, rc):
@@ -30,7 +30,7 @@ def generar_datos():
 
 
 client = mqtt.Client()
-client.username_pw_set(USER, CLAVE)
+#client.username_pw_set(USER, CLAVE)
 client.on_connect = on_connect
 
 print(f"Conectando a {BROKER}...")
@@ -41,9 +41,9 @@ try:
     while True:
         for id_estacion in ESTACIONES:
             datos = generar_datos()
-            base_topic = f"/itt363-grupo3/estacion/estacion 1/sensores"
+            base_topic = f"/itt363-grupo3/{id_estacion}/sensores"
             
-            print(f"===Enviando datos de estacion 1===")
+            print(f"===Enviando datos de {id_estacion}===")
             for sensor, valor in datos.items():
                 topic = f"{base_topic}/{sensor}"
                 client.publish(topic, valor)
