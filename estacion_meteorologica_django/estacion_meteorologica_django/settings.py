@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def dashboard(request):
+    return render(request, "dashboard.html")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,11 +29,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h9&v1qmah5-5e*dj1()hd4i8d)=@+43a6x@lzux9kz$hei*qg%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'itt363-3.eict.ce.pucmm.edu.do']
 
-CSRF_TRUSTED_ORIGINS = ['https://itt363-3.eict.ce.pucmm.edu.do']
+CSRF_TRUSTED_ORIGINS = ['https://itt363-X.eict.ce.pucmm.edu.do']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
@@ -81,8 +87,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'estacion_meteorologica',
         'USER': 'itt363',
-        'PASSWORD': '9Xd%2@DpEdWH!M@',
-        'HOST': 'localhost',
+        'PASSWORD': 'd123d456',
+        'HOST': '192.168.100.153',
         'PORT': '3306',
     }
 }
@@ -123,7 +129,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-import os
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
+STATICFILES_DIRS = [BASE_DIR / "static"]

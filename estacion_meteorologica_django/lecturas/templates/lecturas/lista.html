@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Lecturas Estación Meteorológica</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
 
 <h2>Lecturas Meteorológicas</h2>
 
-<!-- Botón de refrescar manual -->
 <button onclick="location.reload()">Refrescar</button>
 
-<br><br>
+<h2>Alertas</h2>
+
+{% for alerta in alertas %}
+<p style="color:red">{{ alerta }}</p>
+{% empty %}
+<p>No hay alertas</p>
+{% endfor %}
 
 <table border="1" cellpadding="5">
     <tr>
@@ -29,29 +31,7 @@
         <td>{{ lectura.valor }}</td>
         <td>{{ lectura.fecha }}</td>
     </tr>
-    {% empty %}
-    <tr>
-        <td colspan="5">No hay datos disponibles</td>
-    </tr>
     {% endfor %}
 </table>
 
-<br>
-
-<!-- Paginación -->
-<div>
-    {% if page_obj.has_previous %}
-        <a href="?page=1">Primera</a>
-        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-    {% endif %}
-
-    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
-    {% endif %}
-</div>
-
-</body>
-</html>
+{% endblock %}
