@@ -1,0 +1,10 @@
+:root {
+    --primary-teal: #14a4a4;      /* El verde azulado de los botones */
+    --bg-light: #f4f7f9;         /* El fondo grisáceo de la página */
+    --sidebar-bg: #ffffff;       /* Fondo blanco del menú lateral */
+    --text-main: #333333;        /* Texto principal */
+    --text-muted: #888888;       /* Texto secundario (ej. "Media de 15 estaciones") */
+    --border-color: #e0e6ed;     /* Bordes finos de las tarjetas */
+    --danger: #f87171;           /* Rojo para "Offline" */
+    --warning: #fbbf24;          /* Amarillo para "Inestable" */
+}

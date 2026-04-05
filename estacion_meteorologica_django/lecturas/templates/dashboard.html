@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="logo">MeteoCore</div>
+        <nav>
+            <ul>
+                <li>1. Estaciones</li>
+                <li>1. Alarmas</li>
+                <li class="active">4. Dashboard</li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h2>Dashboard Principal</h2>
+            <div class="user-profile">Administrador</div>
+        </header>
+
+        <section class="stats-grid">
+            <div class="card">
+                <span class="label">Temperatura Promedio</span>
+                <h3>{{ temperatura_avg }} °C</h3> </div>
+            </section>
+    </main>
+</div>
+{% endblock %}

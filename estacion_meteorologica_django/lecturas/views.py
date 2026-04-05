@@ -1,6 +1,11 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from .models import Lectura
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
+@login_required
+
 
 def lista_lecturas(request):
 
@@ -32,3 +37,19 @@ def lista_lecturas(request):
         "page_obj": page_obj,
         "alertas": alertas
     })
+
+def lecturas_json(request):
+    lecturas = Lectura.objects.all().order_by('-fecha')[:10]
+
+    data = []
+
+    for lectura in lecturas:
+        data.append({
+            "id": lectura.id,
+            "estacion": lectura.estacion,
+            "sensor": lectura.sensor,
+            "valor": lectura.valor,
+            "fecha": lectura.fecha.strftime("%d/%m/%Y %H:%M:%S")
+        })
+
+    return JsonResponse({"lecturas": data})

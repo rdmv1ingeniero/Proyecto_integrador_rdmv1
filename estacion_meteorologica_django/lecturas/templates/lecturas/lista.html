@@ -2,22 +2,18 @@
 
 {% block content %}
 
-<h2>Lecturas Meteorológicas</h2>
+<h1>Lecturas Meteorológicas</h1>
 
-<button onclick="location.reload()">Refrescar</button>
+<div class="cards">
+    <div class="card">🌡 Temperatura</div>
+    <div class="card">💧 Humedad</div>
+    <div class="card">🌧 Lluvia</div>
+    <div class="card">🌬 Viento</div>
+</div>
 
-<h2>Alertas</h2>
-
-{% for alerta in alertas %}
-<p style="color:red">{{ alerta }}</p>
-{% empty %}
-<p>No hay alertas</p>
-{% endfor %}
-
-<table border="1" cellpadding="5">
+<table>
     <tr>
         <th>ID</th>
-        <th>Estacion</th>
         <th>Sensor</th>
         <th>Valor</th>
         <th>Fecha</th>
@@ -26,7 +22,6 @@
     {% for lectura in page_obj %}
     <tr>
         <td>{{ lectura.id }}</td>
-        <td>{{ lectura.estacion }}</td>
         <td>{{ lectura.sensor }}</td>
         <td>{{ lectura.valor }}</td>
         <td>{{ lectura.fecha }}</td>

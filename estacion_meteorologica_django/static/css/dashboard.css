@@ -1,0 +1,15 @@
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: var(--text-main);
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.nav-item.active {
+    background-color: var(--primary-teal);
+    color: white;
+    font-weight: 600;
+}
