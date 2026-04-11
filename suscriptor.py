@@ -2,7 +2,6 @@ import paho.mqtt.client as mqtt
 import mysql.connector
 
 BROKER = "test.mosquitto.org"
-#BROKER = "mqtt.eict.ce.pucmm.edu.do"
 PORT = 1883
 #USER = "itt363-grupo3"
 #CLAVE = "CnFebqnjbq7F"

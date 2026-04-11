@@ -11,22 +11,47 @@
     <div class="card">🌬 Viento</div>
 </div>
 
-<table>
+<table id="tablaLecturas">
     <tr>
         <th>ID</th>
         <th>Sensor</th>
         <th>Valor</th>
         <th>Fecha</th>
     </tr>
-
-    {% for lectura in page_obj %}
-    <tr>
-        <td>{{ lectura.id }}</td>
-        <td>{{ lectura.sensor }}</td>
-        <td>{{ lectura.valor }}</td>
-        <td>{{ lectura.fecha }}</td>
-    </tr>
-    {% endfor %}
 </table>
+
+<script>
+function actualizarLecturas() {
+    fetch('/api/lecturas/')
+        .then(response => response.json())
+        .then(data => {
+            let tabla = document.getElementById("tablaLecturas");
+
+            tabla.innerHTML = `
+                <tr>
+                    <th>ID</th>
+                    <th>Sensor</th>
+                    <th>Valor</th>
+                    <th>Fecha</th>
+                </tr>
+            `;
+
+            data.lecturas.forEach(lectura => {
+                tabla.innerHTML += `
+                    <tr>
+                        <td>${lectura.id}</td>
+                        <td>${lectura.sensor}</td>
+                        <td>${lectura.valor}</td>
+                        <td>${lectura.fecha}</td>
+                    </tr>
+                `;
+            });
+        });
+}
+
+setInterval(actualizarLecturas, 3000);
+
+actualizarLecturas();
+</script>
 
 {% endblock %}
