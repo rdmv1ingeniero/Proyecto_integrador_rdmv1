@@ -14,10 +14,6 @@ from pathlib import Path
 from django.contrib.auth.decorators import login_required
 
 
-@login_required
-def dashboard(request):
-    return render(request, "dashboard.html")
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,9 +27,9 @@ SECRET_KEY = 'django-insecure-h9&v1qmah5-5e*dj1()hd4i8d)=@+43a6x@lzux9kz$hei*qg%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'itt363-3.eict.ce.pucmm.edu.do']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'itt363-3.eict.ce.pucmm.edu.do', '192.168.100.153']
 
-CSRF_TRUSTED_ORIGINS = ['https://itt363-X.eict.ce.pucmm.edu.do']
+CSRF_TRUSTED_ORIGINS = ['https://itt363-3.eict.ce.pucmm.edu.do']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
@@ -64,7 +60,7 @@ ROOT_URLCONF = 'estacion_meteorologica_django.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,9 +108,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
-
 
 
 # Internationalization
@@ -122,7 +118,7 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santo_Domingo'
 
 USE_I18N = True
 
@@ -134,3 +130,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+##
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -136,3 +136,57 @@ th, td {
 
 /* ====================================*/
 
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    padding: 8px 12px;
+    margin: 0 5px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.pagination span {
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+/*======historial y su boton*/
+
+form input {
+    padding: 8px;
+    margin: 4px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+form button {
+    padding: 8px 12px;
+    background: #1f2937;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background: #374151;
+}
+
+.btn-historial {
+    display: inline-block;
+    background: #1f2937;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.btn-historial:hover {
+    background: #374151;
+}
+/*================*/

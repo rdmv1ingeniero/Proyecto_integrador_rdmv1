@@ -42,7 +42,11 @@ def on_message(client, userdata, msg):
             print("Topic inválido:", msg.topic)
             return
 
-        valor = float(msg.payload.decode())
+        payload = msg.payload.decode()
+        try:
+            valor = float(payload)
+        except ValueError:
+            valor = payload
 
         print(f"Insertando -> Estacion: {estacion}, Sensor: {sensor}, Valor: {valor}")
 

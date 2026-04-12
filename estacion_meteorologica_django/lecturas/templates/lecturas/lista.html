@@ -11,7 +11,10 @@
     <div class="card">🌬 Viento</div>
 </div>
 
-<table id="tablaLecturas">
+
+<h2>Últimas lecturas en vivo</h2>
+
+<table id="tablaTiempoReal">
     <tr>
         <th>ID</th>
         <th>Sensor</th>
@@ -20,12 +23,70 @@
     </tr>
 </table>
 
+
+<a href="{% url 'historial' %}" class="btn-historial">
+     Ver historial completo de lecturas
+</a>
+
+<div id="historialContainer" style="display:none; margin-top:20px;">
+
+<h2>Historial completo de lecturas</h2>
+
+<table id="tablaLecturas">
+    <tr>
+        <th>ID</th>
+        <th>Sensor</th>
+        <th>Valor</th>
+        <th>Fecha</th>
+    </tr>
+
+    {% for lectura in page_obj %}
+    <tr>
+        <td>{{ lectura.id }}</td>
+        <td>{{ lectura.sensor }}</td>
+        <td>{{ lectura.valor }}</td>
+        <td>{{ lectura.fecha|date:"d/m/Y H:i:s" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">Primera</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    <span>
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+    {% endif %}
+</div>
+
+</div>
+
+
 <script>
-function actualizarLecturas() {
+function toggleHistorial() {
+    const container = document.getElementById("historialContainer");
+
+    if (container.style.display === "none") {
+        container.style.display = "block";
+    } else {
+        container.style.display = "none";
+    }
+}
+</script>
+
+<script>
+function actualizarTiempoReal() {
     fetch('/api/lecturas/')
         .then(response => response.json())
         .then(data => {
-            let tabla = document.getElementById("tablaLecturas");
+            let tabla = document.getElementById("tablaTiempoReal");
 
             tabla.innerHTML = `
                 <tr>
@@ -36,7 +97,7 @@ function actualizarLecturas() {
                 </tr>
             `;
 
-            data.lecturas.forEach(lectura => {
+            data.lecturas.slice(0, 5).forEach(lectura => {
                 tabla.innerHTML += `
                     <tr>
                         <td>${lectura.id}</td>
@@ -46,12 +107,13 @@ function actualizarLecturas() {
                     </tr>
                 `;
             });
-        });
+        })
+        .catch(error => console.error("Error cargando lecturas:", error));
 }
 
-setInterval(actualizarLecturas, 3000);
-
-actualizarLecturas();
+setInterval(actualizarTiempoReal, 3000);
+actualizarTiempoReal();
 </script>
+
 
 {% endblock %}

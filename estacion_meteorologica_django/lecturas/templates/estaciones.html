@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Gestión de Estaciones</h1>
+
+{% if alertas_estaciones %}
+<div style="background:#ffdddd; padding:10px; border:1px solid red; margin-bottom:15px;">
+    <h4>⚠ Estaciones sin comunicación</h4>
+
+    {% for alerta in alertas_estaciones %}
+        <p>{{ alerta }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="cards">
+    <div class="card">🟢 Activas</div>
+    <div class="card">🟡 Inactivas</div>
+    <div class="card">🔴 Caídas</div>
+</div>
+
+<h2>Listado de estaciones</h2>
+
+<table>
+    <tr>
+        <th>Estación</th>
+        <th>Estado</th>
+        <th>Última lectura</th>
+        <th>Sensor</th>
+        <th>Valor</th>
+    </tr>
+
+    {% for nombre, data in estaciones.items %}
+    <tr>
+        <td>{{ nombre }}</td>
+        <td>{{ data.estado }}</td>
+        <td>{{ data.ultima_lectura|date:"d/m/Y H:i:s" }}</td>
+        <td>{{ data.sensor }}</td>
+        <td>{{ data.valor }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

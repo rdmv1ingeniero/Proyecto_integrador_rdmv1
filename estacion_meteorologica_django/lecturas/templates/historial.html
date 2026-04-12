@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Historial de Lecturas</h1>
+
+
+<form method="GET" style="margin-bottom:20px;">
+
+    <input type="text" name="sensor" placeholder="Sensor"
+        value="{{ sensor }}">
+
+    <input type="text" name="estacion" placeholder="Estación"
+        value="{{ estacion }}">
+
+    <input type="datetime-local" name="inicio"
+        value="{{ inicio }}">
+
+    <input type="datetime-local" name="fin"
+        value="{{ fin }}">
+
+    <button type="submit">🔍 Filtrar</button>
+
+    <a href="{% url 'historial' %}">🔄 Limpiar</a>
+
+</form>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Estación</th>
+        <th>Sensor</th>
+        <th>Valor</th>
+        <th>Fecha</th>
+    </tr>
+
+    {% for lectura in page_obj %}
+    <tr>
+        <td>{{ lectura.id }}</td>
+        <td>{{ lectura.estacion }}</td>
+        <td>{{ lectura.sensor }}</td>
+        <td>{{ lectura.valor }}</td>
+        <td>{{ lectura.fecha|date:"d/m/Y H:i:s" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="pagination">
+
+    {% if page_obj.has_previous %}
+        <a href="?page=1">Primera</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    <span>
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+    {% endif %}
+
+</div>
+
+{% endblock %}
