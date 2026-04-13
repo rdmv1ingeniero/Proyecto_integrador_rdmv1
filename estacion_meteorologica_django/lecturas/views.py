@@ -1,14 +1,28 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.db.models import Avg
 from django.utils.timezone import now
 from datetime import timedelta
+from django.utils.timezone import localtime
 from .models import Lectura
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.db.models import Q
 from django.utils.dateparse import parse_datetime
 from django.db.models import Max
 from datetime import datetime
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse 
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from django.contrib import messages
+
+
 
 @login_required
 def lista_lecturas(request):
@@ -82,7 +96,6 @@ def estaciones(request):
     estaciones_dict = {}
     alertas_estaciones = []
     
-    # 1. Obtenemos los últimos IDs
     ultimos_ids = (
         Lectura.objects.values('estacion')
         .annotate(max_id=Max('id'))
@@ -96,7 +109,6 @@ def estaciones(request):
         if not lectura.fecha:
             continue
 
-        # Lógica de tiempo corregida para el desfase
         ahora_sistema = datetime.now() 
         fecha_db_plana = lectura.fecha.replace(tzinfo=None)
         diferencia = ahora_sistema - fecha_db_plana
@@ -106,17 +118,15 @@ def estaciones(request):
         elif diferencia <= timedelta(minutes=30):
             estado = "Inactiva"
         else:
-            estado = "Sin comunicación"
-            alertas_estaciones.append(f"⚠ Estación {nombre} sin comunicación")
+            estado = "Sin comunicacion"
+            alertas_estaciones.append(f"estacion {nombre} sin comunicacion")
 
-        # --- ESTO ES LO QUE FALTABA: Llenar el diccionario ---
         estaciones_dict[nombre] = {
             "ultima_lectura": lectura.fecha, # Puedes usar la original para el template
             "estado": estado,
             "sensor": lectura.sensor,
             "valor": lectura.valor
         }
-        # -----------------------------------------------------
 
     return render(request, "estaciones.html", {
         "estaciones": estaciones_dict,
@@ -124,6 +134,14 @@ def estaciones(request):
     })
 
 
+
+@login_required
+def cerrar_sesion(request):
+    logout(request)
+    return redirect('/login/')
+
+
+@login_required
 def lecturas_json(request):
     lecturas = Lectura.objects.all().order_by('-fecha')[:10]
 
@@ -159,7 +177,7 @@ def estaciones_json(request):
             elif diferencia <= timedelta(minutes=10):
                 estado = "Inactiva"
             else:
-                estado = "Sin comunicación"
+                estado = "Sin comunicacion"
 
             estaciones[nombre] = {
                 "estado": estado,
@@ -167,3 +185,113 @@ def estaciones_json(request):
             }
 
     return JsonResponse(estaciones)
+
+
+@login_required
+def obtener_lecturas_filtradas(request):
+    """Función maestra de filtrado para Web y PDF"""
+    lecturas = Lectura.objects.all().order_by('-fecha')
+    
+    sensor = request.GET.get("sensor", "")
+    estacion = request.GET.get("estacion", "")
+    inicio = request.GET.get("inicio", "")
+    fin = request.GET.get("fin", "")
+
+    if sensor:
+        lecturas = lecturas.filter(sensor__icontains=sensor)
+    if estacion:
+        lecturas = lecturas.filter(estacion__icontains=estacion)
+    
+    if inicio:
+        inicio_limpio = inicio.replace('T', ' ')
+        lecturas = lecturas.filter(fecha__gte=inicio_limpio)
+            
+    if fin:
+        fin_limpio = fin.replace('T', ' ')
+        lecturas = lecturas.filter(fecha__lte=fin_limpio)
+
+    return lecturas, sensor, estacion, inicio, fin
+
+@login_required
+def reportes(request):
+
+    lecturas_filtradas, sensor, estacion, inicio, fin = obtener_lecturas_filtradas(request)
+    
+    total = lecturas_filtradas.count()
+    promedio = lecturas_filtradas.aggregate(Avg('valor'))['valor__avg'] or 0
+    ultima = lecturas_filtradas.first()
+
+    paginator = Paginator(lecturas_filtradas, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, "reportes.html", {
+        "page_obj": page_obj,
+        "sensor": sensor,
+        "estacion": estacion,
+        "inicio": inicio,
+        "fin": fin,
+        "total": total,
+        "promedio": round(promedio, 2),
+        "ultima": ultima,
+    })
+
+@login_required
+def generar_reporte_pdf(request):
+
+    lecturas, sensor, estacion, inicio, fin = obtener_lecturas_filtradas(request)
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="reporte_{now().strftime("%Y%m%d_%H%M")}.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    titulo = f"Reporte: {estacion if estacion else 'Todas las estaciones'}"
+    elements.append(Paragraph(titulo, styles['Title']))
+    
+    rango_fechas = f"Periodo: {inicio if inicio else 'Desde el inicio'} hasta {fin if fin else 'Actualidad'}"
+    elements.append(Paragraph(rango_fechas, styles['Normal']))
+    elements.append(Paragraph(f"Sensor: {sensor if sensor else 'Todos'}", styles['Normal']))
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))
+
+    data = [['estacion', 'sensor', 'valor', 'fecha']]
+    for l in lecturas:
+        fecha_local = localtime(l.fecha) 
+        fecha_formateada = fecha_local.strftime('%d/%m/%Y %H:%M:%S')
+        
+        data.append([l.estacion, l.sensor, l.valor, fecha_formateada])
+        
+    tabla = Table(data, repeatRows=1)
+    tabla.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+    ]))
+    
+    elements.append(tabla)
+    doc.build(elements)
+    return response
+
+
+@login_required
+def eliminar_data_view(request):
+    if request.method == "POST":
+        inicio = request.POST.get("inicio_borrar")
+        fin = request.POST.get("fin_borrar")
+
+        if inicio and fin:
+            inicio_limpio = inicio.replace('T', ' ')
+            fin_limpio = fin.replace('T', ' ')
+            
+            queryset = Lectura.objects.filter(fecha__gte=inicio_limpio, fecha__lte=fin_limpio)
+            cantidad = queryset.count()
+            queryset.delete()
+            
+            messages.success(request, f"Éxito: Se han eliminado {cantidad} registros.")
+        else:
+            messages.error(request, "Error: Debes indicar ambos rangos de tiempo.")
+            
+    return render(request, 'eliminar.html')

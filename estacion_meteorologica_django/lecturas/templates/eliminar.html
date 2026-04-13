@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #c0392b;">Mantenimiento de Base de Datos</h1>
+    
+    <div style="border: 2px solid #e74c3c; padding: 30px; border-radius: 12px; background-color: #fff5f5; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0;">🗑️ Borrado de Historial</h2>
+        <p>Utiliza esta herramienta para liberar espacio en el servidor. Los datos borrados <strong>no se pueden recuperar</strong>.</p>
+        
+        <hr style="border: 0; border-top: 1px solid #e74c3c; margin: 20px 0;">
+
+        <form method="POST" onsubmit="return confirm('¿CONFIRMAS EL BORRADO? Esta acción eliminará permanentemente todos los registros en el rango seleccionado.');">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Fecha y Hora de Inicio:</label>
+                <input type="datetime-local" name="inicio_borrar" required 
+                       style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Fecha y Hora de Fin:</label>
+                <input type="datetime-local" name="fin_borrar" required 
+                       style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+
+            <button type="submit" style="width: 100%; background-color: #e74c3c; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                Ejecutar Borrado Permanente
+            </button>
+        </form>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="margin-top: 20px; padding: 15px; border-radius: 8px; 
+                 background-color: {% if message.tags == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; 
+                 color: {% if message.tags == 'success' %}#155724{% else %}#721c24{% endif %}; border: 1px solid;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="{% url 'reportes' %}" style="color: #7f8c8d; text-decoration: none;">← Volver a Reportes</a>
+    </div>
+</div>
+{% endblock %}

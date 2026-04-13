@@ -4,18 +4,45 @@
 <head>
     <title>Dashboard Meteorológico</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        /* Estilo para que el botón se comporte como los enlaces de la sidebar */
+        .sidebar .menu-link {
+            display: block;
+            color: white; /* Ajusta según el color de tus otros enlaces */
+            padding: 10px;
+            text-decoration: none;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            font-size: inherit;
+            cursor: pointer;
+        }
+
+        .sidebar .menu-link:hover {
+            background-color: #333; /* Ajusta según el hover de tus otros enlaces */
+        }
+    </style>
 </head>
 <body>
 
 <div class="sidebar">
     <h2>🌤  Estacion meteorologica G3</h2>
 
-    <a href="/">Inicio</a>
-    <a href="/estaciones/">Estaciones</a>
-    <a href="/usuarios/">Usuarios</a>
-    <a href="/alarmas/">Alarmas</a>
-    <a href="/reportes/">Reportes</a>
-    <a href="/logout/">Cerrar sesión</a>
+    <a href="/" class="menu-link">Inicio</a>
+    <a href="/estaciones/" class="menu-link">Estaciones</a>
+    <a href="/usuarios/" class="menu-link">Usuarios</a>
+    <a href="/alarmas/" class="menu-link">Alarmas</a>
+    <a href="/reportes/" class="menu-link">Reportes</a>
+    <a href="{% url 'limpiar_data' %}" class="menu-link"> Administracion de datos</a>
+    
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="menu-link">
+            Cerrar Sesión
+        </button>
+    </form>
 </div>
 
 <div class="content">

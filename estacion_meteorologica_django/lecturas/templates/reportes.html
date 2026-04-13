@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1> Reportes del sistema</h1>
+
+<form method="GET" style="margin-bottom:20px;">
+    <input type="text" name="sensor" placeholder="Sensor" value="{{ sensor }}">
+    <input type="text" name="estacion" placeholder="Estación" value="{{ estacion }}">
+    
+    <input type="datetime-local" name="inicio" value="{{ inicio }}">
+    <input type="datetime-local" name="fin" value="{{ fin }}">
+
+    <button type="submit"> Filtrar</button>
+    <a href="{% url 'reportes' %}"> Limpiar</a>
+</form>
+
+<div class="cards">
+    <div class="card"> Total: {{ total }}</div>
+    <div class="card"> Promedio: {{ promedio }}</div>
+    <div class="card"> Último registro: {{ ultima.fecha|date:"d/m/Y H:i:s" }}</div>
+</div>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Estación</th>
+        <th>Sensor</th>
+        <th>Valor</th>
+        <th>Fecha</th>
+    </tr>
+    {% for l in page_obj %}
+    <tr>
+        <td>{{ l.id }}</td>
+        <td>{{ l.estacion }}</td>
+        <td>{{ l.sensor }}</td>
+        <td>{{ l.valor }}</td>
+        <td>{{ l.fecha|date:"d/m/Y H:i:s" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1&sensor={{ sensor }}&estacion={{ estacion }}&inicio={{ inicio }}&fin={{ fin }}">Primera</a>
+        <a href="?page={{ page_obj.previous_page_number }}&sensor={{ sensor }}&estacion={{ estacion }}&inicio={{ inicio }}&fin={{ fin }}">Anterior</a>
+    {% endif %}
+
+    <span> Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&sensor={{ sensor }}&estacion={{ estacion }}&inicio={{ inicio }}&fin={{ fin }}">Siguiente</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&sensor={{ sensor }}&estacion={{ estacion }}&inicio={{ inicio }}&fin={{ fin }}">Última</a>
+    {% endif %}
+</div>
+
+<div class="report-container" style="margin-top:30px;">
+    <h2>Generación de Reporte PDF</h2>
+    <a href="{% url 'generar_reporte_pdf' %}?sensor={{ sensor }}&estacion={{ estacion }}&inicio={{ inicio }}&fin={{ fin }}" class="btn-descarga">
+    	Descargar
+    </a>
+</div>
+
+{% endblock %}
