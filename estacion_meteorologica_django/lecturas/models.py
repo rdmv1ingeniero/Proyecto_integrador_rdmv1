@@ -16,3 +16,13 @@ class Lectura(models.Model):
 
     def __str__(self):  
         return f"{self.estacion} - {self.sensor} - {self.valor}"
+
+
+class Alarma(models.Model):
+    estacion = models.CharField(max_length=100)
+    sensor = models.CharField(max_length=100)
+    valor = models.FloatField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.estacion} - {self.sensor}"

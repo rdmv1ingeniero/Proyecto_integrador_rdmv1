@@ -190,3 +190,15 @@ form button:hover {
     background: #374151;
 }
 /*================*/
+
+.alert-box {
+    background: #ffe5e5;
+    border: 1px solid #ff4d4d;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.alert-box h3 {
+    margin-top: 0;
+}

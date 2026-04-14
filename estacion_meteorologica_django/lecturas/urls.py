@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.lista_lecturas, name='lista'),
     path('api/lecturas/', views.lecturas_json, name='lecturas_json'),
     path('estaciones/', views.estaciones, name='estaciones'),
+    path('alarmas/', views.alarmas, name = 'alarmas'),
     path('historial/', views.historial, name='historial'),
     path('reportes/', views.reportes, name='reportes'),
     path('reporte-pdf/', views.generar_reporte_pdf, name='generar_reporte_pdf'),

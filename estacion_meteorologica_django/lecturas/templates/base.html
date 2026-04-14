@@ -5,10 +5,9 @@
     <title>Dashboard Meteorológico</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <style>
-        /* Estilo para que el botón se comporte como los enlaces de la sidebar */
         .sidebar .menu-link {
             display: block;
-            color: white; /* Ajusta según el color de tus otros enlaces */
+            color: white; 
             padding: 10px;
             text-decoration: none;
             background: none;
@@ -21,7 +20,7 @@
         }
 
         .sidebar .menu-link:hover {
-            background-color: #333; /* Ajusta según el hover de tus otros enlaces */
+            background-color: #333; 
         }
     </style>
 </head>
@@ -32,7 +31,6 @@
 
     <a href="/" class="menu-link">Inicio</a>
     <a href="/estaciones/" class="menu-link">Estaciones</a>
-    <a href="/usuarios/" class="menu-link">Usuarios</a>
     <a href="/alarmas/" class="menu-link">Alarmas</a>
     <a href="/reportes/" class="menu-link">Reportes</a>
     <a href="{% url 'limpiar_data' %}" class="menu-link"> Administracion de datos</a>

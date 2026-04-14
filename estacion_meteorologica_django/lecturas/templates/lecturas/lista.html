@@ -7,6 +7,26 @@
 
 <h2>Últimas lecturas en vivo</h2>
 
+<div style="max-width: 800px; margin: 20px auto; padding: 20px;">
+    <div style="border: 2px solid #e74c3c; padding: 25px; border-radius: 12px; background-color: #fff5f5; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <h2 style="color: #c0392b; margin-top: 0;">Alarmas activas</h2>
+
+        {% if alertas %}
+            {% for alerta in alertas %}
+                <p style="font-size: 16px; margin: 10px 0; color: #721c24;">
+                    {{ alerta }}
+                </p>
+            {% endfor %}
+        {% else %}
+            <p style="color: #155724;">
+            	No hay alarmas activas
+            </p>
+        {% endif %}
+
+    </div>
+</div>
+
 <table id="tablaTiempoReal">
     <tr>
         <th>ID</th>

@@ -1,6 +1,66 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Alarmas</h1>
-<p>!!! Temperatura alta !!!</p>
+<div class="container mt-4">
+    <h2 class="mb-4">Historial de alarmas</h2>
+
+    {% if page_obj %}
+    <table class="table table-bordered table-striped shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Estacion</th>
+                <th>Sensor</th>
+                <th>Valor</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alarma in page_obj %}
+            <tr>
+                <td>{{ alarma.id }}</td>
+                <td>{{ alarma.estacion }}</td>
+                <td>{{ alarma.sensor }}</td>
+                <td>{{ alarma.valor }}</td>
+                <td>{{ alarma.fecha|date:"d/m/Y H:i:s" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- PAGINACIÓN -->
+    <nav>
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% else %}
+        <div class="alert alert-info">
+            No hay alarmas registradas.
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

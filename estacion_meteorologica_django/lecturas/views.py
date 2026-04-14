@@ -1,49 +1,63 @@
-from django.shortcuts import render
-from django.core.paginator import Paginator
-from django.db.models import Avg
-from django.utils.timezone import now
-from datetime import timedelta
-from django.utils.timezone import localtime
-from .models import Lectura
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.shortcuts import redirect
-from django.http import JsonResponse
-from django.db.models import Q
-from django.utils.dateparse import parse_datetime
-from django.db.models import Max
-from datetime import datetime
-from django.utils.dateparse import parse_date
-from django.http import HttpResponse 
-from reportlab.pdfgen import canvas
+from django.contrib import messages
+from django.http import JsonResponse, HttpResponse
+from django.core.paginator import Paginator
+from django.db.models import Avg, Max
+from django.utils.timezone import now, localtime
+from datetime import timedelta, datetime
+
+from .models import Lectura, Alarma
+
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
-from django.contrib import messages
-
-
 
 @login_required
 def lista_lecturas(request):
     lecturas = Lectura.objects.all().order_by('-fecha')
+    alertas_display = [] 
+    ultima_temp = lecturas.filter(sensor="temperatura").first()
+    ultima_humedad = lecturas.filter(sensor="humedad").first()
+    ultima_presion = lecturas.filter(sensor="presion").first()
 
-    alertas = []
-    temperatura_alta = False
-    humedad_baja = False
+    def procesar_alarma(lectura, condicion, mensaje):
+        if lectura and lectura.valor is not None and condicion:
+            if not Alarma.objects.filter(fecha=lectura.fecha, sensor=lectura.sensor, valor=lectura.valor).exists():
+                Alarma.objects.create(
+                    estacion=lectura.estacion,
+                    sensor=lectura.sensor,
+                    valor=lectura.valor,
+                    fecha=lectura.fecha
+                )
+            return mensaje
+        return None
 
-    for lectura in lecturas:
-        if lectura.sensor == "temperatura" and lectura.valor is not None and lectura.valor > 35:
-            temperatura_alta = True
+    if ultima_temp:
+        msg = None
+        if ultima_temp.valor < 15:
+            msg = procesar_alarma(ultima_temp, True, f"Temperatura baja detectada: {ultima_temp.valor} °C !!!")
+        elif ultima_temp.valor > 35:
+            msg = procesar_alarma(ultima_temp, True, f"Temperatura alta detectada: {ultima_temp.valor} °C !!!")
+        if msg: alertas_display.append(msg)
 
-        if lectura.sensor == "humedad" and lectura.valor is not None and lectura.valor < 20:
-            humedad_baja = True
+    if ultima_humedad:
+        msg = None
+        if ultima_humedad.valor < 40:
+            msg = procesar_alarma(ultima_humedad, True, f"Humedad baja detectada: {ultima_humedad.valor}% !!!")
+        elif ultima_humedad.valor > 85:
+            msg = procesar_alarma(ultima_humedad, True, f"Humedad alta detectada: {ultima_humedad.valor}% !!!")
+        if msg: alertas_display.append(msg)
 
-    if temperatura_alta:
-        alertas.append("Temperatura alta!!!")
-
-    if humedad_baja:
-        alertas.append("Humedad baja!!!")
+    if ultima_presion:
+        msg = None
+        if ultima_presion.valor < 980:
+            msg = procesar_alarma(ultima_presion, True, f"Presión baja detectada: {ultima_presion.valor} hPa !!!")
+        elif ultima_presion.valor > 1030:
+            msg = procesar_alarma(ultima_presion, True, f"Presión alta detectada: {ultima_presion.valor} hPa !!!")
+        if msg: alertas_display.append(msg)
 
     paginator = Paginator(lecturas, 10)
     page_number = request.GET.get("page")
@@ -51,10 +65,11 @@ def lista_lecturas(request):
 
     return render(request, "lecturas/lista.html", {
         "page_obj": page_obj,
-        "alertas": alertas
+        "alertas": alertas_display
     })
 
 
+    
 @login_required
 def historial(request):
 
@@ -89,6 +104,7 @@ def historial(request):
         "fin": fecha_fin or ""
     })
 
+
     
 
 @login_required
@@ -113,7 +129,7 @@ def estaciones(request):
         fecha_db_plana = lectura.fecha.replace(tzinfo=None)
         diferencia = ahora_sistema - fecha_db_plana
 
-        if diferencia <= timedelta(minutes=10):
+        if diferencia <= timedelta(minutes=5):
             estado = "Activa"
         elif diferencia <= timedelta(minutes=30):
             estado = "Inactiva"
@@ -134,6 +150,17 @@ def estaciones(request):
     })
 
 
+@login_required
+def alarmas(request):
+    alarmas = Alarma.objects.all().order_by('-fecha')
+
+    paginator = Paginator(alarmas, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "alarmas.html", {
+        "page_obj": page_obj
+    })
 
 @login_required
 def cerrar_sesion(request):
